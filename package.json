@@ -1,0 +1,20 @@
+{
+  "name": "serverless-uv",
+  "version": "0.0.1",
+  "description": "Package Python dependencies for your serverless functions using uv",
+  "repository": "https://github.com/paneidos/serverless-uv.git",
+  "author": "Sernin van de Krol",
+  "license": "MIT",
+  "keywords": [
+    "serverless",
+    "serverless-framework",
+    "osls",
+    "aws",
+    "python",
+    "uv"
+  ],
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.7"
+  },
+  "packageManager": "yarn@4.18.1"
+}
