@@ -6,7 +6,11 @@ class UVPlugin implements Plugin {
     hooks: Plugin.Hooks;
     log: Plugin.Logging["log"];
 
-    constructor(serverless: Serverless, options, { log }: Plugin.Logging) {
+    constructor(
+        serverless: Serverless,
+        _options: Serverless.Options,
+        { log }: Plugin.Logging,
+    ) {
         this.serverless = serverless;
         this.log = log;
         this.registerProperties();
