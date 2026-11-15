@@ -1,8 +1,8 @@
 import * as path from "node:path";
 import { describe, expect, it } from "@jest/globals";
 import Serverless from "serverless";
-import type Plugin from "serverless/classes/Plugin";
-import UVPlugin from "../../src/index";
+import type Plugin from "serverless/classes/Plugin.js";
+import UVPlugin from "../../src/index.js";
 
 type JsonSchema = {
     properties: Record<string, unknown>;
@@ -11,7 +11,7 @@ type JsonSchema = {
 
 async function slsProject(name: string): Promise<Serverless> {
     const sls = new Serverless({
-        serviceDir: path.resolve(__dirname, "../projects/", name),
+        serviceDir: path.resolve(import.meta.dirname, "../projects/", name),
         configurationFilename: "serverless.yml",
         configuration: {
             service: "basic-test",

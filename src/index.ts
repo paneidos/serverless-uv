@@ -1,5 +1,5 @@
 import type Serverless from "serverless";
-import type Plugin from "serverless/classes/Plugin";
+import type Plugin from "serverless/classes/Plugin.js";
 
 class UVPlugin implements Plugin {
     serverless: Serverless;

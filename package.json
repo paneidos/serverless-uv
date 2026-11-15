@@ -1,6 +1,10 @@
 {
   "name": "serverless-uv",
+  "engines": {
+    "node": ">=22"
+  },
   "version": "0.0.1",
+  "type": "module",
   "description": "Package Python dependencies for your serverless functions using uv",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -19,7 +23,7 @@
     "build": "tsc --project tsconfig.build.json",
     "prepublish": "yarn build",
     "watch": "tsc --project tsconfig.build.json --watch",
-    "test": "jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "devDependencies": {
     "@babel/core": "^8.1.2",

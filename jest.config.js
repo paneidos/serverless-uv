@@ -1,13 +1,11 @@
-const { createDefaultPreset } = require("ts-jest");
-
-const tsJestTransformCfg = createDefaultPreset().transform;
+import { createDefaultEsmPreset } from "ts-jest";
 
 /** @type {import("jest").Config} **/
-module.exports = {
+export default {
+    ...createDefaultEsmPreset(),
     testEnvironment: "node",
-    transform: {
-        ...tsJestTransformCfg,
-        "^.+\\.m?js$": "babel-jest",
+    moduleNameMapper: {
+        // NodeNext needs .js on relative imports; Jest resolves the .ts source
+        "^(\\.{1,2}/.*)\\.js$": "$1",
     },
-    transformIgnorePatterns: ["/node_modules/(?!(mime)/)"],
 };
