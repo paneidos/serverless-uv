@@ -19,6 +19,10 @@
     "python",
     "uv"
   ],
+  "files": [
+    "lib/**/*",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "prepublish": "yarn build",
