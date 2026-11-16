@@ -9,7 +9,10 @@ type JsonSchema = {
     patternProperties: Record<string, JsonSchema>;
 };
 
-async function slsProject(name: string): Promise<Serverless> {
+async function slsProject(
+    name: string,
+    configuration: Record<string, unknown> = {},
+): Promise<Serverless> {
     const sls = new Serverless({
         serviceDir: path.resolve(import.meta.dirname, "../projects/", name),
         configurationFilename: "serverless.yml",
@@ -17,7 +20,9 @@ async function slsProject(name: string): Promise<Serverless> {
             service: "basic-test",
             provider: {
                 name: "aws",
+                runtime: "python3.13",
             },
+            ...configuration,
         },
         commands: [],
         options: {},
@@ -28,6 +33,14 @@ async function slsProject(name: string): Promise<Serverless> {
     await sls.init();
     sls.pluginManager.addPlugin(UVPlugin as unknown as Plugin.PluginStatic);
     return sls;
+}
+
+function uvPlugin(sls: Serverless): UVPlugin {
+    const plugin = sls.pluginManager.plugins.find((p) => p instanceof UVPlugin);
+    if (plugin == null) {
+        throw new Error("UVPlugin was not loaded");
+    }
+    return plugin as UVPlugin;
 }
 
 function configSchema(sls: Serverless): JsonSchema {
@@ -47,5 +60,28 @@ describe("the config schema", () => {
             .functions as JsonSchema;
         const [functionSchema] = Object.values(functions.patternProperties);
         expect(functionSchema.properties).toHaveProperty("uv");
+    });
+});
+
+describe("building requirements", () => {
+    it("skips every function when uv is disabled globally", async () => {
+        const project = await slsProject("basic", {
+            uv: { enabled: false },
+            functions: { tardis: { handler: "handler.tardis" } },
+        });
+        await uvPlugin(project).buildRequirements();
+        expect(project.service.functions.tardis.layers).toBeUndefined();
+        expect(project.service.layers).toEqual({});
+    });
+
+    it("skips a function with uv disabled", async () => {
+        const project = await slsProject("basic", {
+            functions: {
+                tardis: { handler: "handler.tardis", uv: { enabled: false } },
+            },
+        });
+        await uvPlugin(project).buildRequirements();
+        expect(project.service.functions.tardis.layers).toBeUndefined();
+        expect(project.service.layers).toEqual({});
     });
 });

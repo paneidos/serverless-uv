@@ -5,13 +5,9 @@ import type Aws from "serverless/aws.js";
 import type Plugin from "serverless/classes/Plugin.js";
 import { fileHash } from "./hash.js";
 import { SpawnResult } from "./spawn.js";
-import type { Architecture } from "./types.js";
+import type { Architecture, ServiceWithUv } from "./types.js";
 import { generateLayer, generateRequirements } from "./uv.js";
 import { zipDirectory } from "./zip.js";
-
-type ObjectWithArchitecture = {
-    architecture?: Architecture;
-};
 
 async function fileExists(file: string): Promise<boolean> {
     try {
@@ -121,16 +117,19 @@ class UVPlugin implements Plugin {
     }
 
     async buildRequirements() {
+        const defaultEnabled = (this.serverless.service as ServiceWithUv)
+            .initialServerlessConfig.uv?.enabled;
         const targets = new Map<string, [string, Architecture]>();
         const defaultRuntime = this.serverless.service.provider?.runtime;
         const defaultArchitecture: Architecture | undefined = (
-            this.serverless.service.provider as
-                | ObjectWithArchitecture
-                | undefined
-        )?.architecture as Architecture | undefined;
+            this.serverless.service as ServiceWithUv
+        ).provider.architecture as Architecture | undefined;
 
         const functions = Object.values(this.serverless.service.functions);
         for (const func of functions) {
+            if ((func.uv?.enabled ?? defaultEnabled) === false) {
+                continue;
+            }
             const runtime = func.runtime ?? defaultRuntime;
             const architecture = (func.architecture ??
                 defaultArchitecture ??
