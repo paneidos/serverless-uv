@@ -11,6 +11,11 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
+      - name: Install Yarn
+        run: |
+          sudo npm i -g corepack
+          corepack enable
+          corepack install -g yarn@4
       - run: yarn
       - run: yarn build
       - run: yarn test
