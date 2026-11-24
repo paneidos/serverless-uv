@@ -112,8 +112,9 @@ class UVPlugin implements Plugin {
     }
 
     #getLayerResourceName(runtime: string, architecture: string): string {
-        const name = this.#getLayerName(runtime, architecture).substring(1);
-        return `U${name}LambdaLayer`;
+        return this.aws.naming.getLambdaLayerLogicalId(
+            this.#getLayerName(runtime, architecture),
+        );
     }
 
     async buildRequirements() {
