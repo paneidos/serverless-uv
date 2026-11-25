@@ -16,6 +16,7 @@ jobs:
           sudo npm i -g corepack
           corepack enable
           corepack install -g yarn@4
+      - uses: astral-sh/setup-uv@v7
       - run: yarn
       - run: yarn build
       - run: yarn test

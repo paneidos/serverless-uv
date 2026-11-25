@@ -51,7 +51,7 @@ class UVPlugin implements Plugin {
                     type: "object",
                     properties: {
                         enabled: { type: "boolean" },
-                        globalCache: { type: "boolean" },
+                        cacheEnabled: { type: "boolean" },
                         cacheDir: { type: "string" },
                     },
                 },
@@ -201,11 +201,14 @@ class UVPlugin implements Plugin {
             }
         }
 
+        // rm removes a stale link from an earlier build, not its target.
         if (buildSourcePath !== layerSourcePath) {
+            await fs.rm(layerSourcePath, { recursive: true, force: true });
             await fs.symlink(buildSourcePath, layerSourcePath);
         }
 
         if (buildArtifactPath !== layerArtifactPath) {
+            await fs.rm(layerArtifactPath, { force: true });
             await fs.symlink(buildArtifactPath, layerArtifactPath);
         }
 
@@ -223,7 +226,7 @@ class UVPlugin implements Plugin {
 
     async buildRequirements() {
         const defaultEnabled = (this.serverless.service as ServiceWithUv).custom
-            .uv?.enabled;
+            ?.uv?.enabled;
         const targets = new Map<string, [string, Architecture]>();
         const defaultRuntime = this.serverless.service.provider?.runtime;
         const defaultArchitecture: Architecture | undefined = (
@@ -250,6 +253,10 @@ class UVPlugin implements Plugin {
                 );
                 func.layers = [{ Ref: layerResource }, ...(func.layers ?? [])];
             }
+        }
+
+        if (targets.size === 0) {
+            return;
         }
 
         const requirementsHash = await fileHash(
