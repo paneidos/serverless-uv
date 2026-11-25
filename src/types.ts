@@ -1,3 +1,4 @@
+import type Serverless from "serverless";
 import type Service from "serverless/classes/Service.js";
 
 export const ARCHITECTURES = ["arm64", "x86_64"] as const;
@@ -16,13 +17,18 @@ declare module "serverless" {
 
 export type PluginConfig = {
     enabled?: boolean;
+    cacheDir?: string;
+    cacheEnabled?: boolean;
 };
 
 export type ServiceWithUv = {
-    // Custom properties are not copied to base service
-    initialServerlessConfig: { uv?: PluginConfig };
-
     provider: Service["provider"] & {
         architecture?: Architecture;
     };
+
+    custom: Service["custom"] & { uv: PluginConfig };
 } & Service;
+
+export type ServerlessWithUv = Serverless & {
+    service?: ServiceWithUv;
+};
